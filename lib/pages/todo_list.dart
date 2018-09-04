@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:todo/db/AppDatabase.dart';
+import 'package:todo/models/Task.dart';
 import 'package:todo/pages/add_task.dart';
 
 
@@ -10,15 +12,29 @@ class TodoList extends StatefulWidget {
 }
 
 class TodoListState extends State<TodoList> {
-  List<String> _todoItems = [];
+  List<Task> _taskList = new List();
 
-  void _addTodoItem(String task) {
-    // Only add the task if the user actually entered something
-    if (task.length > 0) {
-      setState(() => _todoItems.add(task));
-    }
-  }
 
+	@override
+	void initState() {
+		_updateTasks();
+		super.initState();
+	}
+
+	void _addTask(String taskTitle) async {
+  	AppDatabase appDatabase = AppDatabase.get();
+  	await appDatabase.insertTask(taskTitle);
+  	_updateTasks();
+	}
+
+	void _updateTasks() async {
+		AppDatabase appDatabase = AppDatabase.get();
+		var list = await appDatabase.getTaskList();
+		setState(() {
+			_taskList.clear();
+			_taskList.addAll(list);
+		});
+	}
 
   void _pushAddTodoScreen() async{
 //    // Push this page onto the stack
@@ -26,8 +42,8 @@ class TodoListState extends State<TodoList> {
 //        // MaterialPageRoute will automatically animate the screen entry, as well
 //        // as adding a back button to close it
 //        new MaterialPageRoute(builder: (context) => new AddTaskScreen()));
-    final task = await Navigator.of(context).pushNamed('/addTask');
-    _addTodoItem(task);
+    final taskTitle = await Navigator.of(context).pushNamed('/addTask');
+    _addTask(taskTitle);
   }
 
   Widget _buildTodoItem(String todoText, int index) {
@@ -42,8 +58,8 @@ class TodoListState extends State<TodoList> {
         // itemBuilder will be automatically be called as many times as it takes for the
         // list to fill up its available space, which is most likely more than the
         // number of todo items we have. So, we need to check the index is OK.
-        if (index < _todoItems.length) {
-          return _buildTodoItem(_todoItems[index], index);
+        if (index < _taskList.length) {
+          return _buildTodoItem(_taskList[index].title, index);
         }
       },
     );
@@ -62,8 +78,10 @@ class TodoListState extends State<TodoList> {
     );
   }
 
-  void _removeTodoItem(int index) {
-    setState(() => _todoItems.removeAt(index));
+  void _removeTodoItem(int index) async{
+		var appDatabase = AppDatabase.get();
+		await appDatabase.deleteTask(_taskList[index].id);
+    _updateTasks();
   }
 
   void _promptRemoveTodoItem(int index) {
@@ -71,7 +89,7 @@ class TodoListState extends State<TodoList> {
         context: context,
         builder: (BuildContext context) {
           return new AlertDialog(
-              title: new Text('Mark "${_todoItems[index]}" as done?'),
+              title: new Text('Mark "${_taskList[index]}" as done?'),
               actions: <Widget>[
                 new FlatButton(
                     child: new Text('CANCEL'),

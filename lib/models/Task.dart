@@ -16,7 +16,7 @@ class Task {
 
   bool operator ==(o) => o is Task && o.id == id;
 
-  //Named constructors
+  //Named constructor
   Task.update(
       {@required this.id,
       @required this.title,

@@ -14,3 +14,5 @@ For help getting started with Flutter, view our online
 * 命名规范
     * https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo
     * https://www.dartlang.org/guides/language/effective-dart/style
+* `path_provider`插件获取程序数据的存储路径：https://flutter.io/cookbook/persistence/reading-writing-files/
+* sqlite数据库使用：https://pub.dartlang.org/packages/sqflite
