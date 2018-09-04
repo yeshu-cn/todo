@@ -8,10 +8,11 @@ class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Todo List',
         home: new TodoList(),
-        routes: <String, WidgetBuilder> {
-        '/addTask': (BuildContext context) => AddTaskScreen(),
-      });
+        routes: <String, WidgetBuilder>{
+          '/addTask': (BuildContext context) => AddTaskScreen(),
+        });
   }
 }

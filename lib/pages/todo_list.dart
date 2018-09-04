@@ -1,10 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:todo/db/AppDatabase.dart';
 import 'package:todo/models/Task.dart';
-import 'package:todo/pages/add_task.dart';
-
+import 'package:todo/utils/app_util.dart';
 
 class TodoList extends StatefulWidget {
   @override
@@ -14,29 +11,28 @@ class TodoList extends StatefulWidget {
 class TodoListState extends State<TodoList> {
   List<Task> _taskList = new List();
 
+  @override
+  void initState() {
+    _updateTasks();
+    super.initState();
+  }
 
-	@override
-	void initState() {
-		_updateTasks();
-		super.initState();
-	}
+  void _addTask(String taskTitle) async {
+    AppDatabase appDatabase = AppDatabase.get();
+    await appDatabase.insertTask(taskTitle);
+    _updateTasks();
+  }
 
-	void _addTask(String taskTitle) async {
-  	AppDatabase appDatabase = AppDatabase.get();
-  	await appDatabase.insertTask(taskTitle);
-  	_updateTasks();
-	}
+  void _updateTasks() async {
+    AppDatabase appDatabase = AppDatabase.get();
+    var list = await appDatabase.getTaskList();
+    setState(() {
+      _taskList.clear();
+      _taskList.addAll(list);
+    });
+  }
 
-	void _updateTasks() async {
-		AppDatabase appDatabase = AppDatabase.get();
-		var list = await appDatabase.getTaskList();
-		setState(() {
-			_taskList.clear();
-			_taskList.addAll(list);
-		});
-	}
-
-  void _pushAddTodoScreen() async{
+  void _pushAddTodoScreen() async {
 //    // Push this page onto the stack
 //    Navigator.of(context).push(
 //        // MaterialPageRoute will automatically animate the screen entry, as well
@@ -53,14 +49,11 @@ class TodoListState extends State<TodoList> {
 
   // Build the whole list of todo items
   Widget _buildTodoList() {
-    return new ListView.builder(
+    return new ListView.separated(
+      itemCount: _taskList.length,
+      separatorBuilder: (BuildContext context, int index) => new Divider(),
       itemBuilder: (context, index) {
-        // itemBuilder will be automatically be called as many times as it takes for the
-        // list to fill up its available space, which is most likely more than the
-        // number of todo items we have. So, we need to check the index is OK.
-        if (index < _taskList.length) {
-          return _buildTodoItem(_taskList[index].title, index);
-        }
+        return _buildTodoItem(_taskList[index].title, index);
       },
     );
   }
@@ -69,7 +62,7 @@ class TodoListState extends State<TodoList> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(title: new Text('Todo List')),
-      body: _buildTodoList(),
+      body: _taskList.isEmpty ? emptyView("No task") : _buildTodoList(),
       floatingActionButton: new FloatingActionButton(
         onPressed: _pushAddTodoScreen,
         tooltip: 'Add task',
@@ -78,9 +71,9 @@ class TodoListState extends State<TodoList> {
     );
   }
 
-  void _removeTodoItem(int index) async{
-		var appDatabase = AppDatabase.get();
-		await appDatabase.deleteTask(_taskList[index].id);
+  void _removeTodoItem(int index) async {
+    var appDatabase = AppDatabase.get();
+    await appDatabase.deleteTask(_taskList[index].id);
     _updateTasks();
   }
 
