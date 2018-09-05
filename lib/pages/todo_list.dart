@@ -38,8 +38,10 @@ class TodoListState extends State<TodoList> {
 //        // MaterialPageRoute will automatically animate the screen entry, as well
 //        // as adding a back button to close it
 //        new MaterialPageRoute(builder: (context) => new AddTaskScreen()));
-    final taskTitle = await Navigator.of(context).pushNamed('/addTask');
-    _addTask(taskTitle);
+    	var taskTitle = await Navigator.of(context).pushNamed('/addTask');
+    	if (null != taskTitle) {
+				_addTask(taskTitle);
+			}
   }
 
   Widget _buildTodoItem(String todoText, int index) {
