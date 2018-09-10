@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todo/db/AppDatabase.dart';
 import 'package:todo/models/Task.dart';
 import 'package:todo/utils/app_util.dart';
@@ -18,6 +19,9 @@ class TodoListState extends State<TodoList> {
   }
 
   void _addTask(String taskTitle) async {
+    if (null == taskTitle || taskTitle.isEmpty) {
+      return;
+    }
     AppDatabase appDatabase = AppDatabase.get();
     await appDatabase.insertTask(taskTitle);
     _updateTasks();
@@ -38,15 +42,22 @@ class TodoListState extends State<TodoList> {
 //        // MaterialPageRoute will automatically animate the screen entry, as well
 //        // as adding a back button to close it
 //        new MaterialPageRoute(builder: (context) => new AddTaskScreen()));
-    	var taskTitle = await Navigator.of(context).pushNamed('/addTask');
-    	if (null != taskTitle) {
-				_addTask(taskTitle);
-			}
+    var taskTitle = await Navigator.of(context).pushNamed('/addTask');
+    _addTask(taskTitle);
   }
 
-  Widget _buildTodoItem(String todoText, int index) {
+  Widget _buildTodoItem(
+      String todoText, int createTime, TaskStatus status, int index) {
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formattedTime =
+        formatter.format(DateTime.fromMillisecondsSinceEpoch(createTime));
     return new ListTile(
-        title: new Text(todoText), onTap: () => _promptRemoveTodoItem(index));
+      title: new Text(todoText),
+      onTap: () => _promptCompletedTodoItem(index),
+      subtitle: new Text(formattedTime),
+      trailing: status == TaskStatus.COMPLETE ? const Icon(Icons.done) : null,
+      //leading: const Icon(Icons.check_box),
+    );
   }
 
   // Build the whole list of todo items
@@ -55,7 +66,8 @@ class TodoListState extends State<TodoList> {
       itemCount: _taskList.length,
       separatorBuilder: (BuildContext context, int index) => new Divider(),
       itemBuilder: (context, index) {
-        return _buildTodoItem(_taskList[index].title, index);
+        return _buildTodoItem(_taskList[index].title,
+            _taskList[index].createTime, _taskList[index].tasksStatus, index);
       },
     );
   }
@@ -79,20 +91,31 @@ class TodoListState extends State<TodoList> {
     _updateTasks();
   }
 
-  void _promptRemoveTodoItem(int index) {
+  void _updateTaskStatus(bool completed, int index) async {
+    var appDatabase = AppDatabase.get();
+    Task task = _taskList[index];
+    task.tasksStatus = completed ? TaskStatus.COMPLETE : TaskStatus.PENDING;
+    await appDatabase.updateTask(task);
+    _updateTasks();
+  }
+
+  void _promptCompletedTodoItem(int index) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return new AlertDialog(
-              title: new Text('Mark "${_taskList[index]}" as done?'),
+              title: new Text('Change "${_taskList[index].title}" task status'),
               actions: <Widget>[
                 new FlatButton(
-                    child: new Text('CANCEL'),
-                    onPressed: () => Navigator.of(context).pop()),
-                new FlatButton(
-                    child: new Text('MARK AS DONE'),
+                    child: new Text('Not Done'),
                     onPressed: () {
-                      _removeTodoItem(index);
+                      _updateTaskStatus(false, index);
+                      Navigator.of(context).pop();
+                    }),
+                new FlatButton(
+                    child: new Text('Done'),
+                    onPressed: () {
+                      _updateTaskStatus(true, index);
                       Navigator.of(context).pop();
                     })
               ]);

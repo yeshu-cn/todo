@@ -10,20 +10,22 @@ For help getting started with Flutter, view our online
 
 ## Links
 
-* https://medium.com/the-web-tub/making-a-todo-app-with-flutter-5c63dab88190
+* [开始写一个 todo app](https://medium.com/the-web-tub/making-a-todo-app-with-flutter-5c63dab88190)
 * 命名规范
     - https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo
     - https://www.dartlang.org/guides/language/effective-dart/style
 * `path_provider`插件获取程序数据的存储路径：https://flutter.io/cookbook/persistence/reading-writing-files/
-* sqlite数据库使用：https://pub.dartlang.org/packages/sqflite
+* [sqlite数据库使用](https://pub.dartlang.org/packages/sqflite)
 * List item 添加分割线
     - https://github.com/flutter/flutter/issues/12492
     - https://docs.flutter.io/flutter/widgets/ListView/ListView.separated.html
     - https://flutter.io/get-started/codelab/
 * Replace app icon
     - [How to replace app icon](https://flutter.io/assets-and-images/#updating-the-app-icon)
-    - [Replace app icon plugin](https://pub.dartlang.org/packages/flutter_launcher_icons)
-    - [android icon 图标在线生成工具](https://romannurik.github.io/AndroidAssetStudio/index.html)
+    - [Replace app icon plugin:flutter_launcher_icons](https://pub.dartlang.org/packages/flutter_launcher_icons)
+    - [android icon在线生成工具:AndroidAssetStudio](https://romannurik.github.io/AndroidAssetStudio/index.html)
+* [Format date to string](https://pub.dartlang.org/documentation/intl/latest/intl/DateFormat-class.html) 
+* [Icon 列表](https://docs.flutter.io/flutter/material/Icons-class.html)
 
 ## 疑问
 
